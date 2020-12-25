@@ -30,7 +30,7 @@ def getBalancedTeam():
                         return team
                         
 def getMemFromDisk(pathToPhotoMemes, user, content_type):
-    photos = os.listdir(pathToPhotoMemes)
+    photos = __getPhotoList(pathToPhotoMemes)
     return __getNotSendedMeme(user, content_type, photos)
 
 def getHelpMessage():
@@ -43,6 +43,12 @@ def getHelpMessage():
 def getVideo(user, content_type):
     return __getNotSendedMeme(user, content_type, db.getVideo())
 
+def rank(pathToPhotoMemes, user):
+    numberOfMeme = len(__getPhotoList(pathToPhotoMemes))
+    seenMemes = db.getViewedMemeForUser(user.id)
+    progres = format((seenMemes/numberOfMeme)*100, '.2f')
+    return 'Widziałeś już {0}% memów spośród {1}'.format(progres, numberOfMeme)
+
 def __getNotSendedMeme(user, content_type, memeList):
     historyList = db.getMemeHistoryForUser(user.id)
     while 0 < len(memeList):
@@ -52,6 +58,9 @@ def __getNotSendedMeme(user, content_type, memeList):
             return meme
         memeList.pop(meme)
     return "Sory but i have sad news for you, I don't have new memes for you."
+
+def __getPhotoList(pathToPhotoMemes):
+    return os.listdir(pathToPhotoMemes)
 
 def getLove():
     loveMeter = random.randint(1, 100)

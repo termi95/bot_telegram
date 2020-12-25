@@ -101,3 +101,19 @@ def updateHistory(userId, meme, content_type):
         print(colored("error: " + str(error) + 'trying to do rollback', config.get('termColor','FAIL')))
         conn.rollback()
     __closeConnect(cursor)
+
+def getViewedMemeForUser(userId, content_type = '/photo'):    
+    conn = __connect()
+    # create a cursor
+    cursor = conn.cursor()
+    # Query to add video
+    sql = "SELECT COUNT(meme) FROM meme_history where user_id=%s AND content_type=%s"
+    try:
+        # execute a statement
+        cursor.execute(sql, (userId, content_type))
+        # commit the changes to the database
+        return cursor.fetchone()[0]
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(colored("error: " + str(error) + 'trying to do rollback', config.get('termColor','FAIL')))
+        conn.rollback()
+    __closeConnect(cursor)

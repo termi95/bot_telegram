@@ -48,6 +48,9 @@ def love(update: Update, context: CallbackContext) -> None:
 def video(update: Update, context: CallbackContext) -> None:
     update.message.reply_text(logicForCommand.getVideo(update.message.from_user, update.message.text))
 
+def rank(update: Update, context: CallbackContext) -> None:
+    update.message.reply_text(logicForCommand.rank(pathToPhotoMemes, update.message.from_user))
+
 updater = Updater(TOKEN)
 
 updater.dispatcher.add_handler(CommandHandler('start', help_command))
@@ -59,6 +62,7 @@ updater.dispatcher.add_handler(CommandHandler(commands["randomTeam"]["name"], ra
 updater.dispatcher.add_handler(CommandHandler(commands["balanceTeam"]["name"], balanceTeamChamp))
 updater.dispatcher.add_handler(CommandHandler(commands["love"]["name"], love))
 updater.dispatcher.add_handler(CommandHandler(commands["video"]["name"], video))
+updater.dispatcher.add_handler(CommandHandler(commands["rank"]["name"], rank))
 
 
 updater.start_polling()

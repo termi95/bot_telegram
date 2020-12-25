@@ -38,6 +38,11 @@ commands = {
         "name":"video",
         "command":"/video",
         "description":"Postaram się znaleźć wideo tak śmieszne jak to tylko możliwe."
+    },
+    "rank":{
+        "name":"rank",
+        "command":"/rank",
+        "description":"Pokazuje twój progres w przeglądaniu memów."
     }
 }
 
