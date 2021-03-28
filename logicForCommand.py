@@ -30,8 +30,7 @@ def getBalancedTeam():
                         return team
                         
 def getMemFromDisk(pathToPhotoMemes, user, content_type):
-    photos = __getPhotoList(pathToPhotoMemes)
-    return __getNotSendedMeme(user, content_type, photos)
+    return __getNotSendedMeme(user, content_type, __getPhotoList(pathToPhotoMemes))
 
 def getHelpMessage():
     helpText = ''    
@@ -49,14 +48,19 @@ def rank(pathToPhotoMemes, user):
     progres = format((seenMemes/numberOfMeme)*100, '.2f')
     return 'Widziałeś już {0}% memów spośród {1}'.format(progres, numberOfMeme)
 
+def sign(user):
+    db.sign(user.id, user.first_name, user.last_name, user.username)
+
+def updateUser(user):
+    db.updateUser(user.id, user.first_name, user.last_name, user.username)
+
 def __getNotSendedMeme(user, content_type, memeList):
     historyList = db.getMemeHistoryForUser(user.id)
-    while 0 < len(memeList):
-        meme = random.choice(memeList)
-        if meme not in historyList:
-            db.updateHistory(user.id, meme, content_type)
-            return meme
-        memeList.pop(meme)
+    notSeenMemes = (list(set(memeList) - set(historyList)))
+    if len(notSeenMemes) > 0:
+        meme = random.choice(notSeenMemes)
+        db.updateHistory(user.id, meme, content_type)
+        return meme
     return "Sory but i have sad news for you, I don't have new memes for you."
 
 def __getPhotoList(pathToPhotoMemes):

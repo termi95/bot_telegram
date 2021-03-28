@@ -117,3 +117,85 @@ def getViewedMemeForUser(userId, content_type = '/photo'):
         print(colored("error: " + str(error) + 'trying to do rollback', config.get('termColor','FAIL')))
         conn.rollback()
     __closeConnect(cursor)
+
+def sign(user_id, first_name, last_name = None, username = None) -> None:
+    conn = __connect()
+    # create a cursor
+    cursor = conn.cursor()
+    # Query to add video
+    sql = 'INSERT INTO "user"(user_id, first_name, last_name, username) VALUES(%s, %s, %s, %s)'
+    try:
+        # execute a statement
+        cursor.execute(sql, (user_id, first_name, last_name, username))
+        # commit the changes to the database
+        conn.commit()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(colored("error: " + str(error) + 'trying to do rollback', config.get('termColor','FAIL')))
+        conn.rollback()
+        try:
+            # execute a statement
+            sql = 'UPDATE "user" SET first_name = \'{}\', last_name = \'{}\', username = \'{}\' WHERE user_id = \'{}\';'.format(first_name,last_name,username,user_id)
+            cursor.execute(sql, (user_id, first_name, last_name, username))
+            # commit the changes to the database
+            conn.commit()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(colored("error: " + str(error) + 'trying to do rollback', config.get('termColor','FAIL')))
+            conn.rollback()
+        
+    __closeConnect(cursor)
+
+def updateUser(user_id, first_name, last_name = None, username = None) -> None:
+    conn = __connect()
+    # create a cursor
+    cursor = conn.cursor()
+    try:
+        # execute a statement
+        sql = 'UPDATE "user" SET first_name = \'{}\', last_name = \'{}\', username = \'{}\' WHERE user_id = \'{}\';'.format(first_name,last_name,username,user_id)
+        cursor.execute(sql, (user_id, first_name, last_name, username))
+        # commit the changes to the database
+        conn.commit()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(colored("error: " + str(error) + 'trying to do rollback', config.get('termColor','FAIL')))
+        conn.rollback()
+        
+    __closeConnect(cursor)
+    
+def checkUserExist(user_id) -> int:
+    conn = __connect()
+    # create a cursor
+    cursor = conn.cursor()
+    # execute a statement
+    sql = 'SELECT "user".user_id FROM "user" WHERE user_id = {};'.format(user_id)
+    try:
+        # execute a statement
+        cursor.execute(sql)
+        # commit the changes to the database
+        return len(cursor.fetchall())
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(colored("error: " + str(error) + 'trying to do rollback', config.get('termColor','FAIL')))
+        conn.rollback()
+        
+    __closeConnect(cursor)
+
+def getMemeRank():        
+    conn = __connect()
+    # create a cursor
+    cursor = conn.cursor()
+    # Query to add video
+    sql =   """
+                SELECT "user".first_name, "user".last_name, "user".username, COUNT(meme) AS zobaczone_memy
+                FROM meme_history
+                INNER JOIN "user" ON "user".user_id=meme_history.user_id
+                WHERE content_type = '/photo'
+                GROUP  BY "user".user_id
+                LIMIT 5;
+            """
+    try:
+        # execute a statement
+        cursor.execute(sql)
+        # commit the changes to the database
+        return cursor.fetchall()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(colored("error: " + str(error) + 'trying to do rollback', config.get('termColor','FAIL')))
+        conn.rollback()
+    __closeConnect(cursor)
