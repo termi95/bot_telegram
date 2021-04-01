@@ -43,10 +43,27 @@ def getVideo(user, content_type):
     return __getNotSendedMeme(user, content_type, db.getVideo())
 
 def rank(pathToPhotoMemes, user):
+    updateUser(user)
     numberOfMeme = len(__getPhotoList(pathToPhotoMemes))
     seenMemes = db.getViewedMemeForUser(user.id)
     progres = format((seenMemes/numberOfMeme)*100, '.2f')
-    return 'Widziałeś już {0}% memów spośród {1}'.format(progres, numberOfMeme)
+    memeTableRank = __getTableRank(db.getMemeRank(), numberOfMeme)
+    return memeTableRank + '\nWidziałeś już {0} memów spośród {1}({2}%)'.format(seenMemes, numberOfMeme, progres)
+
+def __getTableRank(memeRank, numberOfMeme) -> str:
+    tableRank = ""
+    for i in enumerate(memeRank):
+        position = i[0] + 1
+        person = i[1]
+        progres = format((person[3]/numberOfMeme)*100, '.2f')
+        if person[2] != None:
+            name = person[2] + " "
+        else:
+            surname = (person[1] if person[1] != None else "")
+            name = person[0] + " " + surname
+        tableRank = tableRank + str(position) + ". Użytkownik " + name + " widział " + str(person[3]) + " z " + str(numberOfMeme) + " (" + progres + "%)" + "\n"
+
+    return tableRank
 
 def sign(user):
     db.sign(user.id, user.first_name, user.last_name, user.username)

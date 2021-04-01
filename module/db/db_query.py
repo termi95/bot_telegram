@@ -188,6 +188,7 @@ def getMemeRank():
                 INNER JOIN "user" ON "user".user_id=meme_history.user_id
                 WHERE content_type = '/photo'
                 GROUP  BY "user".user_id
+                ORDER BY COUNT(meme) DESC
                 LIMIT 5;
             """
     try:
